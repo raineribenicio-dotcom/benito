@@ -74,8 +74,9 @@ benito/
       (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
 - [~] **M7 — Crecimiento:** emails transaccionales (Resend con fallback consola),
       sitemap dinámico + robots, suscripciones (recompra: alta desde producto +
-      gestión en cuenta). Pendiente: i18n/multi-moneda en UI, carrito abandonado,
-      facturación recurrente real con Stripe Subscriptions.
+      gestión en cuenta), **recuperación de carrito abandonado** (cron + email +
+      enlace de recuperación). Pendiente: i18n/multi-moneda en UI, facturación
+      recurrente real con Stripe Subscriptions.
 
 ## Pagos (Stripe)
 

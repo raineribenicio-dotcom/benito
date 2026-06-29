@@ -17,6 +17,7 @@ const schema = z.object({
 
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
+  CRON_SECRET: z.string().optional(),
 
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_DEFAULT_CURRENCY: z.string().default("EUR"),

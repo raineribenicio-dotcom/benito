@@ -87,6 +87,10 @@ export async function createOrderFromCart(contact: CheckoutContact): Promise<Che
       return created;
     });
 
+    // Guarda el email en el carrito: si el cliente abandona en el paso de pago,
+    // el carrito sigue siendo recuperable por el recordatorio de carrito abandonado.
+    await prisma.cart.update({ where: { id: cart.id }, data: { email: contact.email } });
+
     // Pago (fuera de la transacción de DB). Stub => succeeded.
     const intent = await paymentProvider.createPaymentIntent({
       amount: cart.total,
