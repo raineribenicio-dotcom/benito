@@ -1,4 +1,5 @@
 import { SearchBox } from "./SearchBox";
+import { getCurrentUser } from "@/lib/auth/session";
 
 // Cabecera de la tienda: logo, búsqueda instantánea y accesos. Sticky en móvil.
 
@@ -10,7 +11,8 @@ const NAV = [
   { href: "/catalogo?category=salud", label: "Salud" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const user = await getCurrentUser();
   return (
     <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="container flex items-center gap-4 py-3">
@@ -28,7 +30,7 @@ export function SiteHeader() {
             Carrito
           </a>
           <a href="/cuenta" className="text-sm text-gray-600 hover:text-brand-600">
-            Cuenta
+            {user ? (user.name ?? "Cuenta") : "Entrar"}
           </a>
         </nav>
       </div>

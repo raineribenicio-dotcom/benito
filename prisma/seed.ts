@@ -1,4 +1,5 @@
 import { PrismaClient, ProductStatus } from "@prisma/client";
+import { hashPassword } from "../src/lib/auth/password";
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,19 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Seeding…");
+
+  // Usuario administrador de ejemplo (admin@benito.shop / admin1234)
+  await prisma.user.upsert({
+    where: { email: "admin@benito.shop" },
+    update: {},
+    create: {
+      email: "admin@benito.shop",
+      name: "Admin",
+      role: "ADMIN",
+      emailVerified: new Date(),
+      passwordHash: await hashPassword("admin1234"),
+    },
+  });
 
   const warehouse = await prisma.location.upsert({
     where: { id: "loc_main" },

@@ -65,7 +65,9 @@ benito/
 - [x] **M3 — Carrito y checkout:** carrito persistente (cookie invitado), checkout
       1 paso, envío/impuestos/cupones, creación de pedido y reserva de stock.
 - [ ] **M4 — Pagos:** Stripe (PaymentIntent + webhooks firmados), PayPal.
-- [ ] **M5 — Cuenta:** auth, direcciones, pedidos, devoluciones self-service.
+- [x] **M5 — Cuenta:** Auth.js (Credentials + Google opcional), registro/login,
+      direcciones, historial de pedidos, devoluciones self-service, merge de
+      carrito de invitado al iniciar sesión.
 - [x] **M6 — Admin:** dashboard KPIs, CRUD productos, gestión de pedidos
       (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
 - [ ] **M7 — Crecimiento:** suscripciones, emails, i18n/multi-moneda, SEO/schema.org.

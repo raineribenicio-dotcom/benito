@@ -163,6 +163,39 @@ export async function removeItem(itemId: string) {
   await prisma.cartItem.delete({ where: { id: itemId } });
 }
 
+/** Al iniciar sesión, asocia el carrito de invitado al usuario y fusiona líneas. */
+export async function mergeGuestCartIntoUser(userId: string, guestToken: string): Promise<void> {
+  const guest = await prisma.cart.findFirst({
+    where: { token: guestToken, status: "ACTIVE" },
+    include: { items: true },
+  });
+  if (!guest || guest.items.length === 0) return;
+
+  const userCart = await prisma.cart.findFirst({ where: { userId, status: "ACTIVE" } });
+  if (!userCart) {
+    await prisma.cart.update({ where: { id: guest.id }, data: { userId } });
+    return;
+  }
+
+  // Fusiona las líneas del carrito de invitado en el del usuario
+  for (const item of guest.items) {
+    const existing = await prisma.cartItem.findUnique({
+      where: { cartId_variantId: { cartId: userCart.id, variantId: item.variantId } },
+    });
+    await prisma.cartItem.upsert({
+      where: { cartId_variantId: { cartId: userCart.id, variantId: item.variantId } },
+      update: { quantity: (existing?.quantity ?? 0) + item.quantity },
+      create: {
+        cartId: userCart.id,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      },
+    });
+  }
+  await prisma.cart.update({ where: { id: guest.id }, data: { status: "ABANDONED" } });
+}
+
 export async function applyCoupon(code: string): Promise<{ ok: boolean; message: string }> {
   const cartId = await getOrCreateCartId();
   const normalized = code.trim().toUpperCase();
