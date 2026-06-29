@@ -61,8 +61,9 @@ benito/
 ## Hoja de ruta por módulos
 
 - [x] **M1 — Fundamentos:** scaffold, schema Prisma, dominio + tests, home, seed.
-- [ ] **M2 — Catálogo:** listado con filtros/orden, página de producto, búsqueda.
-- [ ] **M3 — Carrito y checkout:** carrito persistente, checkout 1 paso, impuestos/envío.
+- [x] **M2 — Catálogo:** listado con filtros/orden, página de producto, búsqueda.
+- [x] **M3 — Carrito y checkout:** carrito persistente (cookie invitado), checkout
+      1 paso, envío/impuestos/cupones, creación de pedido y reserva de stock.
 - [ ] **M4 — Pagos:** Stripe (PaymentIntent + webhooks firmados), PayPal.
 - [ ] **M5 — Cuenta:** auth, direcciones, pedidos, devoluciones self-service.
 - [ ] **M6 — Admin:** dashboard KPIs, CRUD catálogo, pedidos, CSV, cupones.

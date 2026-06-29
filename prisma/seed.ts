@@ -119,6 +119,13 @@ async function main() {
     },
   });
 
+  // Cupón de ejemplo: 10% de descuento
+  await prisma.discount.upsert({
+    where: { code: "BIENVENIDA10" },
+    update: {},
+    create: { code: "BIENVENIDA10", type: "PERCENTAGE", value: 10, isActive: true },
+  });
+
   console.log("✅ Seed completado.");
 }
 

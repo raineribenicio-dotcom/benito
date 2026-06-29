@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { addItem, getActiveCart } from "@/lib/core/cart";
 
-// Añadir al carrito. Hito 2: valida la entrada y responde OK para habilitar el
-// flujo de UI. La persistencia (Cart/CartItem, cookie de invitado, merge al
-// iniciar sesión) se implementa en M3.
+// Carrito: añadir item (POST) y consultar (GET). Persistente por cookie de
+// invitado o usuario autenticado. Validación con Zod.
 
 export const runtime = "nodejs";
 
@@ -28,6 +28,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // TODO(M3): resolver carrito por cookie/usuario, validar stock, persistir item.
-  return NextResponse.json({ ok: true, item: parsed.data }, { status: 200 });
+  try {
+    await addItem(parsed.data.variantId, parsed.data.quantity);
+    const cart = await getActiveCart();
+    return NextResponse.json({ ok: true, itemCount: cart?.itemCount ?? 0 });
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 409 });
+  }
+}
+
+export async function GET() {
+  const cart = await getActiveCart();
+  return NextResponse.json({ cart });
 }
