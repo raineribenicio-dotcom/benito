@@ -30,6 +30,8 @@ export function ProductPurchase({
   );
   const [qty, setQty] = useState(1);
   const [status, setStatus] = useState<"idle" | "adding" | "added" | "error">("idle");
+  const [subInterval, setSubInterval] = useState("");
+  const [subMsg, setSubMsg] = useState<string | null>(null);
 
   const variant = useMemo(
     () =>
@@ -53,6 +55,21 @@ export function ProductPurchase({
     } catch {
       setStatus("error");
     }
+  }
+
+  async function subscribe() {
+    if (!variant || !subInterval) return;
+    setSubMsg(null);
+    const res = await fetch("/api/subscriptions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variantId: variant.id, interval: subInterval, quantity: qty }),
+    });
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
+    setSubMsg(res.ok ? "✓ Suscripción creada. Gestiónala en tu cuenta." : "No se pudo crear la suscripción.");
   }
 
   return (
@@ -127,6 +144,38 @@ export function ProductPurchase({
       {status === "added" && <p className="text-sm font-medium text-green-600">✓ Añadido al carrito</p>}
       {status === "error" && (
         <p className="text-sm text-red-600">No se pudo añadir. Inténtalo de nuevo.</p>
+      )}
+
+      {/* Suscríbete y ahorra (recompra automática) */}
+      {!outOfStock && (
+        <div className="rounded-xl border border-dashed border-brand-300 bg-brand-50 p-3">
+          <p className="text-sm font-medium text-brand-800">Suscríbete y recíbelo automáticamente</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <label htmlFor="sub-interval" className="sr-only">Frecuencia</label>
+            <select
+              id="sub-interval"
+              value={subInterval}
+              onChange={(e) => setSubInterval(e.target.value)}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">Elige frecuencia…</option>
+              <option value="WEEKLY">Cada semana</option>
+              <option value="BIWEEKLY">Cada 2 semanas</option>
+              <option value="MONTHLY">Cada mes</option>
+              <option value="BIMONTHLY">Cada 2 meses</option>
+              <option value="QUARTERLY">Cada 3 meses</option>
+            </select>
+            <button
+              type="button"
+              onClick={subscribe}
+              disabled={!subInterval}
+              className="rounded-full border border-brand-600 px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-100 disabled:opacity-50"
+            >
+              Suscribirme
+            </button>
+          </div>
+          {subMsg && <p className="mt-2 text-sm text-brand-800">{subMsg}</p>}
+        </div>
       )}
     </div>
   );

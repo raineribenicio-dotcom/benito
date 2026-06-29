@@ -72,7 +72,10 @@ benito/
       carrito de invitado al iniciar sesión.
 - [x] **M6 — Admin:** dashboard KPIs, CRUD productos, gestión de pedidos
       (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
-- [ ] **M7 — Crecimiento:** suscripciones, emails, i18n/multi-moneda, SEO/schema.org.
+- [~] **M7 — Crecimiento:** emails transaccionales (Resend con fallback consola),
+      sitemap dinámico + robots, suscripciones (recompra: alta desde producto +
+      gestión en cuenta). Pendiente: i18n/multi-moneda en UI, carrito abandonado,
+      facturación recurrente real con Stripe Subscriptions.
 
 ## Pagos (Stripe)
 

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db/client";
 import { paymentProvider } from "@/lib/payments";
 import { getActiveCart } from "./cart";
 import { getCurrentUserId } from "@/lib/auth/session";
+import { sendOrderConfirmation } from "./notifications";
 
 // Conversión de carrito a pedido: snapshot de líneas, reserva de stock, creación
 // del pago (proveedor con fallback stub) y marcado del carrito como convertido.
@@ -114,6 +115,7 @@ export async function createOrderFromCart(contact: CheckoutContact): Promise<Che
         prisma.order.update({ where: { id: order.id }, data: { status: "PAID" } }),
         prisma.cart.update({ where: { id: cart.id }, data: { status: "CONVERTED" } }),
       ]);
+      await sendOrderConfirmation(order.id);
     }
 
     return {

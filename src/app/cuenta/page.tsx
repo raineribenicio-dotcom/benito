@@ -38,7 +38,10 @@ export default async function AccountPage() {
           <section>
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Pedidos recientes</h2>
-              <a href="/cuenta/pedidos" className="text-sm text-brand-600 hover:underline">Ver todos</a>
+              <span className="flex gap-3 text-sm">
+                <a href="/cuenta/suscripciones" className="text-brand-600 hover:underline">Suscripciones</a>
+                <a href="/cuenta/pedidos" className="text-brand-600 hover:underline">Ver todos</a>
+              </span>
             </div>
             {orders.length === 0 ? (
               <p className="mt-3 text-sm text-gray-500">Aún no has hecho pedidos.</p>

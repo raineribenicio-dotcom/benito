@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/payments/stripe-client";
 import { prisma } from "@/lib/db/client";
+import { sendOrderConfirmation } from "@/lib/core/notifications";
 
 // Webhook de Stripe. Verifica la FIRMA con STRIPE_WEBHOOK_SECRET sobre el cuerpo
 // crudo (imprescindible: nunca confíes en el body sin verificar). Confirma el
@@ -22,6 +23,7 @@ async function markOrderPaid(paymentIntentId: string, cartId?: string) {
       .update({ where: { id: cartId }, data: { status: "CONVERTED" } })
       .catch(() => undefined);
   }
+  await sendOrderConfirmation(payment.orderId);
 }
 
 export async function POST(req: NextRequest) {
