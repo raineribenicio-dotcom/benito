@@ -1,10 +1,13 @@
-import { formatMoney } from "@/lib/core/money";
+import { formatPrice } from "@/lib/core/money";
+import { getI18n } from "@/lib/i18n";
 import { Stars } from "./Stars";
 import type { CatalogProduct } from "@/lib/core/catalog";
 
 // Tarjeta de producto reutilizable (home, catálogo, relacionados). Mobile-first.
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
+  const { currency, locale } = getI18n();
+  const money = (amount: number) => formatPrice(amount, product.currency, currency, locale);
   const hasDiscount = product.compareAt != null && product.compareAt > product.price;
   const discountPct = hasDiscount
     ? Math.round(((product.compareAt! - product.price) / product.compareAt!) * 100)
@@ -40,11 +43,11 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
       )}
       <div className="mt-1 flex items-baseline gap-2">
         <span className="font-semibold text-brand-700">
-          {formatMoney(product.price, product.currency)}
+          {money(product.price)}
         </span>
         {hasDiscount && (
           <span className="text-xs text-gray-400 line-through">
-            {formatMoney(product.compareAt!, product.currency)}
+            {money(product.compareAt!)}
           </span>
         )}
       </div>

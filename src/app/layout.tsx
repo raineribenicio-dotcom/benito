@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getI18n } from "@/lib/i18n";
+import { I18nProvider } from "@/components/I18nProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -16,9 +18,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const { locale, currency } = getI18n();
   return (
-    <html lang="es">
-      <body>{children}</body>
+    <html lang={locale}>
+      <body>
+        <I18nProvider locale={locale} currency={currency}>
+          {children}
+        </I18nProvider>
+      </body>
     </html>
   );
 }

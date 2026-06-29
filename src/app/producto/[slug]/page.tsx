@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/core/catalog";
-import { formatMoney } from "@/lib/core/money";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Stars } from "@/components/Stars";
 import { ProductPurchase, type VariantVM } from "@/components/ProductPurchase";

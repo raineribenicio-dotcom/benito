@@ -1,5 +1,6 @@
-import { formatMoney } from "@/lib/core/money";
+import { formatPrice } from "@/lib/core/money";
 import { getHomeData } from "@/lib/core/storefront";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 
 // Home dinámica (Server Component). Lee colecciones destacadas y más vendidos.
@@ -9,6 +10,7 @@ export const revalidate = 60; // ISR: refresca cada minuto
 
 export default async function HomePage() {
   const { featuredCollections, bestSellers } = await getHomeData();
+  const { currency, locale, t } = getI18n();
 
   return (
     <>
@@ -18,20 +20,19 @@ export default async function HomePage() {
       <section className="bg-brand-900 text-white">
         <div className="container py-16 sm:py-24">
           <p className="text-sm font-medium uppercase tracking-wide text-brand-100">
-            Multi-categoría · Envío 24/48h
+            {t.home.heroKicker}
           </p>
           <h1 className="mt-3 max-w-2xl text-3xl font-bold leading-tight sm:text-5xl">
-            Todo lo que buscas, en una sola tienda
+            {t.home.heroTitle}
           </h1>
           <p className="mt-4 max-w-xl text-brand-100">
-            Moda, electrónica, hogar, belleza y salud. La mejor experiencia de compra,
-            optimizada para tu móvil.
+            {t.home.heroSubtitle}
           </p>
           <a
             href="/catalogo"
             className="mt-8 inline-flex rounded-full bg-white px-6 py-3 font-semibold text-brand-900 transition hover:bg-brand-50"
           >
-            Explorar catálogo
+            {t.home.explore}
           </a>
         </div>
       </section>
@@ -39,7 +40,7 @@ export default async function HomePage() {
       {/* Colecciones destacadas */}
       {featuredCollections.length > 0 && (
         <section className="container py-12">
-          <h2 className="text-2xl font-bold">Colecciones destacadas</h2>
+          <h2 className="text-2xl font-bold">{t.home.featured}</h2>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {featuredCollections.map((c) => (
               <a
@@ -56,7 +57,7 @@ export default async function HomePage() {
 
       {/* Más vendidos */}
       <section className="container py-12">
-        <h2 className="text-2xl font-bold">Más vendidos</h2>
+        <h2 className="text-2xl font-bold">{t.home.bestSellers}</h2>
         {bestSellers.length === 0 ? (
           <p className="mt-4 text-gray-500">
             Aún no hay productos. Ejecuta <code className="rounded bg-gray-100 px-1">pnpm db:seed</code>{" "}
@@ -78,7 +79,7 @@ export default async function HomePage() {
                 </div>
                 <h3 className="mt-2 line-clamp-1 text-sm font-medium">{p.title}</h3>
                 <p className="text-sm font-semibold text-brand-700">
-                  {formatMoney(p.price, p.currency)}
+                  {formatPrice(p.price, p.currency, currency, locale)}
                 </p>
               </a>
             ))}

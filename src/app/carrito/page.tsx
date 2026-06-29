@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getActiveCart } from "@/lib/core/cart";
-import { formatMoney } from "@/lib/core/money";
+import { formatPrice } from "@/lib/core/money";
+import { getI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { updateItemAction, removeItemAction, applyCouponAction } from "@/lib/actions/cart";
 import { OrderSummary } from "@/components/OrderSummary";
@@ -9,18 +10,19 @@ export const metadata: Metadata = { title: "Carrito" };
 
 export default async function CartPage() {
   const cart = await getActiveCart();
+  const { currency, locale, t } = getI18n();
 
   if (!cart || cart.items.length === 0) {
     return (
       <>
         <SiteHeader />
         <main className="container py-16 text-center">
-          <h1 className="text-2xl font-bold">Tu carrito está vacío</h1>
+          <h1 className="text-2xl font-bold">{t.cart.empty}</h1>
           <a
             href="/catalogo"
             className="mt-6 inline-flex rounded-full bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
           >
-            Explorar catálogo
+            {t.home.explore}
           </a>
         </main>
       </>
@@ -31,7 +33,7 @@ export default async function CartPage() {
     <>
       <SiteHeader />
       <main className="container py-8">
-        <h1 className="text-2xl font-bold">Carrito</h1>
+        <h1 className="text-2xl font-bold">{t.cart.title}</h1>
         <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
           {/* Líneas */}
           <ul className="divide-y divide-gray-100">
@@ -75,7 +77,7 @@ export default async function CartPage() {
                   </div>
                 </div>
                 <div className="text-right font-semibold">
-                  {formatMoney(it.lineTotal, cart.currency)}
+                  {formatPrice(it.lineTotal, cart.currency, currency, locale)}
                 </div>
               </li>
             ))}
@@ -99,7 +101,7 @@ export default async function CartPage() {
               href="/checkout"
               className="mt-4 block rounded-full bg-brand-600 px-6 py-3 text-center font-semibold text-white hover:bg-brand-700"
             >
-              Finalizar compra
+              {t.cart.checkout}
             </a>
           </div>
         </div>

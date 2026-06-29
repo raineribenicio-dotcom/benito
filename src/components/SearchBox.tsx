@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { formatMoney } from "@/lib/core/money";
 import type { SearchHit } from "@/lib/search";
+import { useI18n } from "./I18nProvider";
 
 // Búsqueda instantánea con autocompletado e imágenes. Debounce + cancelación.
 
-export function SearchBox() {
+export function SearchBox({ placeholder = "Buscar productos…" }: { placeholder?: string }) {
+  const { price } = useI18n();
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [open, setOpen] = useState(false);
@@ -49,7 +50,7 @@ export function SearchBox() {
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => hits.length && setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Buscar productos…"
+        placeholder={placeholder}
         className="w-full rounded-full border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none"
         autoComplete="off"
       />
@@ -69,7 +70,7 @@ export function SearchBox() {
                 </span>
                 <span className="flex-1 truncate text-sm">{h.title}</span>
                 <span className="text-sm font-semibold text-brand-700">
-                  {formatMoney(h.price, h.currency)}
+                  {price(h.price, h.currency)}
                 </span>
               </a>
             </li>

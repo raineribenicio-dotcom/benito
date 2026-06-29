@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatMoney } from "@/lib/core/money";
+import { useI18n } from "./I18nProvider";
 
 // Selección de variante por opciones (Talla, Color…), stock en tiempo real y
 // añadir al carrito. La lógica de carrito completa llega en M3; aquí el botón
@@ -25,6 +25,7 @@ export function ProductPurchase({
   options: OptionVM[];
   variants: VariantVM[];
 }) {
+  const { price } = useI18n();
   const [selected, setSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(options.map((o) => [o.name, variants[0]?.optionValues[o.name] ?? o.values[0]])),
   );
@@ -76,11 +77,11 @@ export function ProductPurchase({
     <div className="space-y-5">
       <div className="flex items-baseline gap-3">
         <span className="text-3xl font-bold">
-          {variant ? formatMoney(variant.price, variant.currency) : "—"}
+          {variant ? price(variant.price, variant.currency) : "—"}
         </span>
         {variant?.compareAt && variant.compareAt > variant.price && (
           <span className="text-lg text-gray-400 line-through">
-            {formatMoney(variant.compareAt, variant.currency)}
+            {price(variant.compareAt, variant.currency)}
           </span>
         )}
       </div>

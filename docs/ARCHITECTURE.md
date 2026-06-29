@@ -75,8 +75,15 @@ benito/
 - [~] **M7 — Crecimiento:** emails transaccionales (Resend con fallback consola),
       sitemap dinámico + robots, suscripciones (recompra: alta desde producto +
       gestión en cuenta), **recuperación de carrito abandonado** (cron + email +
-      enlace de recuperación). Pendiente: i18n/multi-moneda en UI, facturación
+      enlace de recuperación), **i18n (es/en) + multi-moneda en la UI** (selector,
+      cookies, diccionarios, precios convertidos en tienda). Pendiente: facturación
       recurrente real con Stripe Subscriptions.
+
+> **Nota multi-moneda:** la conversión actual es de *display* (tasas estáticas en
+> `lib/i18n/currency.ts`). El cobro se realiza en la moneda base (EUR) y los
+> pedidos guardan su moneda de liquidación (no se reconvierten en el histórico).
+> Para multi-moneda real de liquidación: fijar precios por moneda en `VariantPrice`
+> y crear el PaymentIntent en esa moneda. La capa de display ya está lista.
 
 ## Pagos (Stripe)
 
