@@ -66,7 +66,8 @@ benito/
       1 paso, envío/impuestos/cupones, creación de pedido y reserva de stock.
 - [ ] **M4 — Pagos:** Stripe (PaymentIntent + webhooks firmados), PayPal.
 - [ ] **M5 — Cuenta:** auth, direcciones, pedidos, devoluciones self-service.
-- [ ] **M6 — Admin:** dashboard KPIs, CRUD catálogo, pedidos, CSV, cupones.
+- [x] **M6 — Admin:** dashboard KPIs, CRUD productos, gestión de pedidos
+      (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
 - [ ] **M7 — Crecimiento:** suscripciones, emails, i18n/multi-moneda, SEO/schema.org.
 
 ## Setup
