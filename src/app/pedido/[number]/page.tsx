@@ -36,6 +36,11 @@ export default async function OrderConfirmationPage({
             Pedido <strong>{order.number}</strong> confirmado. Te hemos enviado un email a{" "}
             <strong>{order.email}</strong>.
           </p>
+          {order.status === "PENDING" && (
+            <p className="mt-3 text-sm text-amber-700">
+              Estamos confirmando tu pago. El estado se actualizará en unos segundos.
+            </p>
+          )}
         </div>
 
         <div className="mt-8">

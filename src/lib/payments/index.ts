@@ -1,4 +1,5 @@
 import { features } from "@/lib/env";
+import { getStripe } from "./stripe-client";
 
 // Interfaz de pagos. Implementación Stripe si hay clave; si no, un stub que
 // simula un PaymentIntent para poder desarrollar el flujo de checkout sin cuenta.
@@ -9,6 +10,7 @@ export type CreateIntentInput = {
   currency: string;
   orderId: string;
   customerEmail: string;
+  metadata?: Record<string, string>;
 };
 
 export type PaymentIntentResult = {
@@ -22,14 +24,36 @@ export interface PaymentProvider {
   refund(paymentRef: string, amount?: number): Promise<{ id: string; amount: number }>;
 }
 
+function mapStatus(s: string): PaymentIntentResult["status"] {
+  if (s === "succeeded") return "succeeded";
+  if (s === "processing") return "processing";
+  return "requires_action"; // requires_payment_method/confirmation/action
+}
+
 class StripePayments implements PaymentProvider {
   async createPaymentIntent(input: CreateIntentInput): Promise<PaymentIntentResult> {
-    // TODO: usar el SDK de Stripe cuando STRIPE_SECRET_KEY esté presente.
-    // import Stripe from "stripe"; const stripe = new Stripe(env.STRIPE_SECRET_KEY!)
-    throw new Error("Stripe configurado pero el SDK aún no está cableado en este hito.");
+    const stripe = getStripe();
+    const intent = await stripe.paymentIntents.create({
+      amount: input.amount,
+      currency: input.currency.toLowerCase(),
+      receipt_email: input.customerEmail,
+      automatic_payment_methods: { enabled: true }, // tarjeta, Apple Pay, Google Pay
+      metadata: { orderId: input.orderId, ...input.metadata },
+    });
+    return {
+      id: intent.id,
+      clientSecret: intent.client_secret ?? "",
+      status: mapStatus(intent.status),
+    };
   }
-  async refund(): Promise<{ id: string; amount: number }> {
-    throw new Error("Stripe refund no implementado en este hito.");
+
+  async refund(paymentRef: string, amount?: number): Promise<{ id: string; amount: number }> {
+    const stripe = getStripe();
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentRef,
+      ...(amount && amount > 0 ? { amount } : {}),
+    });
+    return { id: refund.id, amount: refund.amount ?? 0 };
   }
 }
 

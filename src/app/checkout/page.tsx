@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getActiveCart } from "@/lib/core/cart";
+import { features } from "@/lib/env";
 import { SiteHeader } from "@/components/SiteHeader";
 import { OrderSummary } from "@/components/OrderSummary";
+import { StripeCheckoutForm } from "@/components/StripeCheckoutForm";
 import { placeOrderAction } from "@/lib/actions/checkout";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
@@ -30,7 +32,10 @@ export default async function CheckoutPage({
         )}
 
         <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
-          {/* Checkout express de 1 paso: contacto + envío + pago en una pantalla */}
+          {/* Con claves de Stripe: pago real con Elements. Sin claves: flujo stub. */}
+          {features.stripe ? (
+            <StripeCheckoutForm />
+          ) : (
           <form action={placeOrderAction} className="space-y-6">
             <section>
               <h2 className="mb-3 font-semibold">Contacto</h2>
@@ -77,6 +82,7 @@ export default async function CheckoutPage({
               Compra protegida · Cumplimiento PCI vía Stripe
             </p>
           </form>
+          )}
 
           <div>
             <OrderSummary cart={cart} />

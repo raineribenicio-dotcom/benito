@@ -21,7 +21,7 @@ export type CheckoutContact = {
 };
 
 export type CheckoutResult =
-  | { ok: true; orderNumber: string; paymentStatus: string }
+  | { ok: true; orderNumber: string; paymentStatus: string; clientSecret: string }
   | { ok: false; error: string };
 
 async function nextOrderNumber(): Promise<string> {
@@ -83,7 +83,6 @@ export async function createOrderFromCart(contact: CheckoutContact): Promise<Che
         }
       }
 
-      await tx.cart.update({ where: { id: cart.id }, data: { status: "CONVERTED" } });
       return created;
     });
 
@@ -93,6 +92,7 @@ export async function createOrderFromCart(contact: CheckoutContact): Promise<Che
       currency: cart.currency,
       orderId: order.id,
       customerEmail: contact.email,
+      metadata: { cartId: cart.id },
     });
 
     await prisma.payment.create({
@@ -106,11 +106,22 @@ export async function createOrderFromCart(contact: CheckoutContact): Promise<Che
       },
     });
 
+    // Stub: el pago se confirma al instante => marcamos PAID y convertimos el
+    // carrito. Stripe real: el pedido queda PENDING y el carrito ACTIVO; el
+    // webhook payment_intent.succeeded confirma ambos tras el pago del cliente.
     if (intent.status === "succeeded") {
-      await prisma.order.update({ where: { id: order.id }, data: { status: "PAID" } });
+      await prisma.$transaction([
+        prisma.order.update({ where: { id: order.id }, data: { status: "PAID" } }),
+        prisma.cart.update({ where: { id: cart.id }, data: { status: "CONVERTED" } }),
+      ]);
     }
 
-    return { ok: true, orderNumber: number, paymentStatus: intent.status };
+    return {
+      ok: true,
+      orderNumber: number,
+      paymentStatus: intent.status,
+      clientSecret: intent.clientSecret,
+    };
   } catch (err) {
     console.error("[checkout] error:", (err as Error).message);
     return { ok: false, error: "No se pudo completar el pedido. Inténtalo de nuevo." };

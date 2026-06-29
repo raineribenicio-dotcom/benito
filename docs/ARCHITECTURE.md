@@ -64,13 +64,38 @@ benito/
 - [x] **M2 — Catálogo:** listado con filtros/orden, página de producto, búsqueda.
 - [x] **M3 — Carrito y checkout:** carrito persistente (cookie invitado), checkout
       1 paso, envío/impuestos/cupones, creación de pedido y reserva de stock.
-- [ ] **M4 — Pagos:** Stripe (PaymentIntent + webhooks firmados), PayPal.
+- [x] **M4 — Pagos:** Stripe real (PaymentIntent + Stripe Elements en el checkout
+      + webhook firmado que confirma el pedido). Sin claves => proveedor stub.
+      PayPal pendiente.
 - [x] **M5 — Cuenta:** Auth.js (Credentials + Google opcional), registro/login,
       direcciones, historial de pedidos, devoluciones self-service, merge de
       carrito de invitado al iniciar sesión.
 - [x] **M6 — Admin:** dashboard KPIs, CRUD productos, gestión de pedidos
       (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
 - [ ] **M7 — Crecimiento:** suscripciones, emails, i18n/multi-moneda, SEO/schema.org.
+
+## Pagos (Stripe)
+
+Flujo según haya o no claves (`STRIPE_SECRET_KEY`):
+
+- **Sin claves (stub):** el checkout usa un formulario con Server Action; el pago
+  se simula como `succeeded`, el pedido pasa a `PAID` y el carrito se vacía. Útil
+  para desarrollo end-to-end.
+- **Con claves (real):** el checkout monta **Stripe Elements**. Paso 1 (dirección)
+  → `POST /api/checkout/intent` crea el pedido `PENDING` + `PaymentIntent` y
+  devuelve el `clientSecret`. Paso 2 → el cliente confirma el pago (tarjeta,
+  Apple Pay, Google Pay). El pedido se marca `PAID` y el carrito se vacía **solo**
+  cuando llega `payment_intent.succeeded` al webhook firmado.
+
+Webhook: configura un endpoint en Stripe a `/api/stripe/webhook` y pega el
+`whsec_...` en `STRIPE_WEBHOOK_SECRET`. En local:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+La firma se verifica siempre sobre el cuerpo crudo; nunca se confía en el payload
+sin verificar.
 
 ## Setup
 
