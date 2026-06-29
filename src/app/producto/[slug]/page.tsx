@@ -1,0 +1,200 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getProductBySlug } from "@/lib/core/catalog";
+import { formatMoney } from "@/lib/core/money";
+import { SiteHeader } from "@/components/SiteHeader";
+import { Stars } from "@/components/Stars";
+import { ProductPurchase, type VariantVM } from "@/components/ProductPurchase";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug);
+  if (!product) return { title: "Producto no encontrado" };
+  return {
+    title: product.metaTitle ?? product.title,
+    description: product.metaDescription ?? product.description ?? undefined,
+    openGraph: {
+      title: product.title,
+      images: product.media[0]?.url ? [product.media[0].url] : undefined,
+    },
+  };
+}
+
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const product = await getProductBySlug(params.slug);
+  if (!product) notFound();
+
+  const cheapest = product.variants.reduce(
+    (min, v) => (v.priceAmount < min ? v.priceAmount : min),
+    product.variants[0]?.priceAmount ?? 0,
+  );
+  const currency = product.variants[0]?.currency ?? "EUR";
+
+  const options = product.options.map((o) => ({
+    name: o.name,
+    values: o.values.map((v) => v.value),
+  }));
+
+  const variants: VariantVM[] = product.variants.map((v) => ({
+    id: v.id,
+    sku: v.sku,
+    price: v.priceAmount,
+    compareAt: v.compareAt,
+    currency: v.currency,
+    available: v.stockLevels.reduce((sum, s) => sum + s.available, 0),
+    optionValues: Object.fromEntries(
+      v.optionValues.map((ov) => [
+        // recuperamos el nombre de la opción a partir del valor
+        product.options.find((o) => o.values.some((val) => val.id === ov.optionValue.id))?.name ?? "",
+        ov.optionValue.value,
+      ]),
+    ),
+  }));
+
+  // Datos estructurados schema.org (SEO técnico del brief)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    description: product.description ?? undefined,
+    image: product.media.map((m) => m.url),
+    brand: product.brand ? { "@type": "Brand", name: product.brand.name } : undefined,
+    aggregateRating:
+      product.ratingCount > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: product.ratingAverage,
+            reviewCount: product.ratingCount,
+          }
+        : undefined,
+    offers: {
+      "@type": "Offer",
+      price: (cheapest / 100).toFixed(2),
+      priceCurrency: currency,
+      availability:
+        variants.some((v) => v.available > 0)
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+    },
+  };
+
+  return (
+    <>
+      <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main className="container py-8">
+        {/* Breadcrumb */}
+        <nav className="mb-4 text-sm text-gray-500" aria-label="Migas de pan">
+          <a href="/" className="hover:text-brand-600">Inicio</a>
+          {" / "}
+          <a href="/catalogo" className="hover:text-brand-600">Catálogo</a>
+          {" / "}
+          <span className="text-gray-700">{product.title}</span>
+        </nav>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Galería */}
+          <div>
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
+              {product.media[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={product.media[0].url}
+                  alt={product.media[0].alt ?? product.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-gray-300">Sin imagen</div>
+              )}
+            </div>
+            {product.media.length > 1 && (
+              <div className="mt-3 grid grid-cols-5 gap-2">
+                {product.media.slice(0, 5).map((m) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={m.id}
+                    src={m.url}
+                    alt={m.alt ?? ""}
+                    className="aspect-square w-full cursor-pointer rounded-lg object-cover ring-1 ring-gray-200"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Compra */}
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">{product.title}</h1>
+            {product.ratingCount > 0 && (
+              <div className="mt-2">
+                <Stars rating={product.ratingAverage} count={product.ratingCount} />
+              </div>
+            )}
+            {product.description && <p className="mt-4 text-gray-600">{product.description}</p>}
+
+            <div className="mt-6">
+              <ProductPurchase options={options} variants={variants} />
+            </div>
+
+            {/* Ficha técnica (atributos flexibles por categoría) */}
+            {product.attributeValues.length > 0 && (
+              <div className="mt-8">
+                <h2 className="font-semibold">Ficha técnica</h2>
+                <dl className="mt-2 divide-y divide-gray-100 text-sm">
+                  {product.attributeValues.map((a) => (
+                    <div key={a.id} className="flex justify-between py-1.5">
+                      <dt className="text-gray-500">{a.key}</dt>
+                      <dd className="font-medium">
+                        {a.valueString ?? a.valueNumber ?? (a.valueBool ? "Sí" : "No")} {a.unit}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Reseñas con fotos (prueba social, CRO) */}
+        <section className="mt-12">
+          <h2 className="text-xl font-bold">Reseñas</h2>
+          {product.reviews.length === 0 ? (
+            <p className="mt-2 text-gray-500">Aún no hay reseñas. ¡Sé el primero!</p>
+          ) : (
+            <ul className="mt-4 space-y-6">
+              {product.reviews.map((r) => (
+                <li key={r.id} className="border-b border-gray-100 pb-6">
+                  <div className="flex items-center gap-2">
+                    <Stars rating={r.rating} />
+                    <span className="text-sm font-medium">{r.user.name ?? "Cliente"}</span>
+                    {r.isVerified && (
+                      <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
+                        Compra verificada
+                      </span>
+                    )}
+                  </div>
+                  {r.title && <p className="mt-1 font-medium">{r.title}</p>}
+                  {r.body && <p className="mt-1 text-sm text-gray-600">{r.body}</p>}
+                  {r.media.length > 0 && (
+                    <div className="mt-2 flex gap-2">
+                      {r.media.map((m) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img key={m.id} src={m.url} alt={m.alt ?? ""} className="h-16 w-16 rounded-lg object-cover" />
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </main>
+    </>
+  );
+}

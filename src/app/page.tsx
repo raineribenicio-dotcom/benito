@@ -1,5 +1,6 @@
 import { formatMoney } from "@/lib/core/money";
 import { getHomeData } from "@/lib/core/storefront";
+import { SiteHeader } from "@/components/SiteHeader";
 
 // Home dinámica (Server Component). Lee colecciones destacadas y más vendidos.
 // Tolerante a fallos: si aún no hay base de datos, renderiza el esqueleto.
@@ -10,7 +11,9 @@ export default async function HomePage() {
   const { featuredCollections, bestSellers } = await getHomeData();
 
   return (
-    <main className="min-h-screen">
+    <>
+      <SiteHeader />
+      <main className="min-h-screen">
       {/* Hero — mobile-first */}
       <section className="bg-brand-900 text-white">
         <div className="container py-16 sm:py-24">
@@ -82,6 +85,7 @@ export default async function HomePage() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+    </>
   );
 }
