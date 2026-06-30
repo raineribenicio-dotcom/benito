@@ -70,8 +70,9 @@ benito/
 - [x] **M5 — Cuenta:** Auth.js (Credentials + Google opcional), registro/login,
       direcciones, historial de pedidos, devoluciones self-service, merge de
       carrito de invitado al iniciar sesión.
-- [x] **M6 — Admin:** dashboard KPIs, CRUD productos, gestión de pedidos
-      (estados + reembolsos parciales), cupones, con guard de rol y AuditLog.
+- [x] **M6 — Admin:** dashboard KPIs, CRUD productos, **importación masiva CSV**
+      (upsert por SKU), gestión de pedidos (estados + reembolsos parciales),
+      cupones, con guard de rol y AuditLog.
 - [~] **M7 — Crecimiento:** emails transaccionales (Resend con fallback consola),
       sitemap dinámico + robots, suscripciones (recompra: alta desde producto +
       gestión en cuenta), **recuperación de carrito abandonado** (cron + email +

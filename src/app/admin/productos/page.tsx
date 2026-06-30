@@ -19,9 +19,14 @@ export default async function AdminProducts({
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Productos</h1>
-        <a href="/admin/productos/nuevo" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
-          + Nuevo producto
-        </a>
+        <div className="flex gap-2">
+          <a href="/admin/productos/importar" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50">
+            Importar CSV
+          </a>
+          <a href="/admin/productos/nuevo" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+            + Nuevo producto
+          </a>
+        </div>
       </div>
 
       <form method="get" className="mt-4">

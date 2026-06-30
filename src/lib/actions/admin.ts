@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db/client";
 import { paymentProvider } from "@/lib/payments";
 import { requireAdmin } from "@/lib/auth/guard";
+import { parseProductsCsv } from "@/lib/core/csv-import";
 
 // Mutaciones del panel. Cada acción exige rol admin y registra un AuditLog.
 
@@ -64,6 +65,76 @@ export async function createProductAction(formData: FormData) {
   await audit("product.create", "Product", product.id, { title: data.title });
   revalidatePath("/admin/productos");
   redirect("/admin/productos");
+}
+
+export type ImportResult = { created: number; updated: number; errors: { line: number; message: string }[] };
+
+export async function importProductsAction(_prev: ImportResult | null, formData: FormData): Promise<ImportResult> {
+  await requireAdmin();
+  const csv = String(formData.get("csv") ?? "");
+  const { products, errors } = parseProductsCsv(csv);
+
+  const location = await prisma.location.findFirst();
+  const categories = await prisma.category.findMany({ select: { id: true, slug: true } });
+  const catBySlug = new Map(categories.map((c) => [c.slug, c.id]));
+
+  let created = 0;
+  let updated = 0;
+
+  for (const p of products) {
+    const categoryId = p.category ? catBySlug.get(p.category) : undefined;
+    const existing = await prisma.productVariant.findUnique({
+      where: { sku: p.sku },
+      select: { id: true, productId: true },
+    });
+
+    if (existing) {
+      // Actualiza variante (precio/stock) y producto existentes
+      await prisma.productVariant.update({
+        where: { id: existing.id },
+        data: { priceAmount: p.price, compareAt: p.compareAt ?? undefined },
+      });
+      await prisma.product.update({
+        where: { id: existing.productId },
+        data: { title: p.title, description: p.description, status: p.status },
+      });
+      if (location) {
+        await prisma.stockLevel.upsert({
+          where: { variantId_locationId: { variantId: existing.id, locationId: location.id } },
+          update: { available: p.stock },
+          create: { variantId: existing.id, locationId: location.id, available: p.stock },
+        });
+      }
+      updated++;
+    } else {
+      await prisma.product.create({
+        data: {
+          slug: `${slugify(p.title)}-${Date.now().toString(36)}-${created}`,
+          title: p.title,
+          description: p.description,
+          status: p.status,
+          publishedAt: p.status === "ACTIVE" ? new Date() : null,
+          ...(categoryId ? { categories: { create: [{ categoryId }] } } : {}),
+          variants: {
+            create: [
+              {
+                sku: p.sku,
+                priceAmount: p.price,
+                compareAt: p.compareAt ?? undefined,
+                currency: "EUR",
+                ...(location && { stockLevels: { create: [{ locationId: location.id, available: p.stock }] } }),
+              },
+            ],
+          },
+        },
+      });
+      created++;
+    }
+  }
+
+  await audit("product.import", "Product", undefined, { created, updated, errors: errors.length });
+  revalidatePath("/admin/productos");
+  return { created, updated, errors };
 }
 
 export async function updateProductStatusAction(formData: FormData) {
