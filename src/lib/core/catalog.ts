@@ -141,6 +141,50 @@ export async function getProductBySlug(slug: string) {
   }
 }
 
+export async function getCollectionBySlug(slug: string): Promise<{
+  title: string;
+  description: string | null;
+  products: CatalogProduct[];
+} | null> {
+  try {
+    const collection = await prisma.collection.findUnique({
+      where: { slug },
+      include: {
+        products: {
+          orderBy: { position: "asc" },
+          include: {
+            product: {
+              include: {
+                media: { orderBy: { position: "asc" }, take: 1 },
+                variants: { orderBy: { priceAmount: "asc" }, take: 1 },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!collection) return null;
+
+    const products: CatalogProduct[] = collection.products
+      .filter((cp) => cp.product.status === "ACTIVE")
+      .map((cp) => ({
+        id: cp.product.id,
+        slug: cp.product.slug,
+        title: cp.product.title,
+        imageUrl: cp.product.media[0]?.url ?? null,
+        price: cp.product.variants[0]?.priceAmount ?? 0,
+        compareAt: cp.product.variants[0]?.compareAt ?? null,
+        currency: cp.product.variants[0]?.currency ?? "EUR",
+        ratingAverage: cp.product.ratingAverage,
+        ratingCount: cp.product.ratingCount,
+      }));
+
+    return { title: collection.title, description: collection.description, products };
+  } catch {
+    return null;
+  }
+}
+
 export async function getFilterFacets() {
   try {
     const [categories, brands] = await Promise.all([

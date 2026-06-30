@@ -26,6 +26,7 @@ export function ProductPurchase({
   variants: VariantVM[];
 }) {
   const { price } = useI18n();
+  const [wished, setWished] = useState(false);
   const [selected, setSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(options.map((o) => [o.name, variants[0]?.optionValues[o.name] ?? o.values[0]])),
   );
@@ -55,6 +56,23 @@ export function ProductPurchase({
       setStatus(res.ok ? "added" : "error");
     } catch {
       setStatus("error");
+    }
+  }
+
+  async function toggleWishlist() {
+    if (!variant) return;
+    const res = await fetch("/api/wishlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variantId: variant.id }),
+    });
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
+    if (res.ok) {
+      const data = (await res.json()) as { inWishlist: boolean };
+      setWished(data.inWishlist);
     }
   }
 
@@ -139,6 +157,18 @@ export function ProductPurchase({
           className="flex-1 rounded-full bg-brand-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           {outOfStock ? "Agotado" : status === "adding" ? "Añadiendo…" : "Añadir al carrito"}
+        </button>
+        <button
+          type="button"
+          onClick={toggleWishlist}
+          aria-pressed={wished}
+          aria-label={wished ? "Quitar de favoritos" : "Añadir a favoritos"}
+          title="Favoritos"
+          className={`rounded-full border px-4 py-3 text-lg transition ${
+            wished ? "border-red-300 bg-red-50 text-red-600" : "border-gray-300 text-gray-500 hover:border-gray-400"
+          }`}
+        >
+          {wished ? "♥" : "♡"}
         </button>
       </div>
 
