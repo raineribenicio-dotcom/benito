@@ -21,7 +21,7 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="container flex items-center gap-4 py-3">
         <a href="/" className="text-xl font-bold text-brand-700">
-          Benito
+          Nuvora
         </a>
         <div className="hidden flex-1 sm:block">
           <SearchBox placeholder={t.header.search} />

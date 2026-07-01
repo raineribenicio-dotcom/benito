@@ -1,4 +1,4 @@
-// Benito — E-commerce multi-categoría
+// Nuvora — E-commerce multi-categoría
 // Schema Prisma. Patrón inspirado en Shopify: Product → Variant → Option/Value,
 // catálogo flexible por categoría (atributos tipados + JSONB), multi-moneda,
 // i18n por tablas de traducción, suscripciones y CRO (reviews, Q&A, wishlist).

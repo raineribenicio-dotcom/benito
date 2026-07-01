@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth/guard";
 
-export const metadata: Metadata = { title: "Admin · Benito", robots: { index: false } };
+export const metadata: Metadata = { title: "Admin · Nuvora", robots: { index: false } };
 
 const NAV = [
   { href: "/admin", label: "Dashboard" },
@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex">
         <aside className="hidden w-56 shrink-0 border-r border-gray-200 bg-white p-4 sm:block">
           <a href="/admin" className="text-lg font-bold text-brand-700">
-            Benito Admin
+            Nuvora Admin
           </a>
           <nav className="mt-6 space-y-1">
             {NAV.map((n) => (

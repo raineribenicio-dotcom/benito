@@ -1,11 +1,11 @@
-# Benito
+# Nuvora
 
 Plataforma de **e-commerce multi-categoría** (moda, electrónica, hogar, belleza, salud),
 mobile-first y optimizada para conversión. Stack: **Next.js 14 (App Router) · TypeScript ·
 Tailwind · PostgreSQL + Prisma · Stripe · Algolia**.
 
-> Estado: **Hito 1 — Fundamentos** (scaffold, modelo de datos, dominio + tests, home).
-> Ver la hoja de ruta y las decisiones de arquitectura en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+> Estado del proyecto y seguimiento en [`docs/PROGRESS.md`](docs/PROGRESS.md).
+> Arquitectura y decisiones en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Arranque rápido
 

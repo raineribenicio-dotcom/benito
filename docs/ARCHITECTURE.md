@@ -1,4 +1,4 @@
-# Arquitectura — Benito
+# Arquitectura — Nuvora
 
 Plataforma de e-commerce multi-categoría (moda, electrónica, hogar, belleza, salud),
 mobile-first, estándar Shopify. Este documento describe las decisiones tomadas y la

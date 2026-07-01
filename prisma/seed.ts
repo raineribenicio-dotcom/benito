@@ -10,12 +10,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding…");
 
-  // Usuario administrador de ejemplo (admin@benito.shop / admin1234)
+  // Usuario administrador de ejemplo (admin@nuvora.shop / admin1234)
   await prisma.user.upsert({
-    where: { email: "admin@benito.shop" },
+    where: { email: "admin@nuvora.shop" },
     update: {},
     create: {
-      email: "admin@benito.shop",
+      email: "admin@nuvora.shop",
       name: "Admin",
       role: "ADMIN",
       emailVerified: new Date(),

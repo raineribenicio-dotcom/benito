@@ -1,4 +1,4 @@
-# Panel de control — Benito
+# Panel de control — Nuvora
 
 > Estado del proyecto para seguimiento. Actualizado al último commit.
 > PR de revisión: **https://github.com/raineribenicio-dotcom/benito/pull/1**
@@ -46,7 +46,7 @@ pnpm db:generate && pnpm db:push && pnpm db:seed
 pnpm dev                          # http://localhost:3000
 ```
 
-Admin de ejemplo: `admin@benito.shop` / `admin1234`. Cupón demo: `BIENVENIDA10`.
+Admin de ejemplo: `admin@nuvora.shop` / `admin1234`. Cupón demo: `BIENVENIDA10`.
 
 ## Qué claves pegar (resumen)
 

@@ -8,7 +8,7 @@ const field = "w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border
 export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
   return (
     <main className="container flex min-h-screen max-w-md flex-col justify-center py-12">
-      <a href="/" className="mb-8 text-center text-2xl font-bold text-brand-700">Benito</a>
+      <a href="/" className="mb-8 text-center text-2xl font-bold text-brand-700">Nuvora</a>
       <h1 className="text-xl font-bold">Iniciar sesión</h1>
 
       {searchParams.error && (

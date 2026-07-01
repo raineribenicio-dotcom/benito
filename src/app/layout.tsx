@@ -5,15 +5,15 @@ import { I18nProvider } from "@/components/I18nProvider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Benito — Tu tienda multi-categoría",
-    template: "%s · Benito",
+    default: "Nuvora — Tu tienda multi-categoría",
+    template: "%s · Nuvora",
   },
   description:
     "Moda, electrónica, hogar, belleza y salud. Envío rápido, pago seguro y la mejor experiencia de compra móvil.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   openGraph: {
     type: "website",
-    siteName: "Benito",
+    siteName: "Nuvora",
   },
 };
 
