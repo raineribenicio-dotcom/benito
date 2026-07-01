@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/lib/core/catalog";
+import { getProductBySlug, getRelatedProducts } from "@/lib/core/catalog";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Stars } from "@/components/Stars";
 import { ProductPurchase, type VariantVM } from "@/components/ProductPurchase";
+import { ProductGallery } from "@/components/ProductGallery";
+import { ProductCard } from "@/components/ProductCard";
 
 export async function generateMetadata({
   params,
@@ -25,6 +27,8 @@ export async function generateMetadata({
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug);
   if (!product) notFound();
+
+  const { related, boughtTogether } = await getRelatedProducts(product.id);
 
   const cheapest = product.variants.reduce(
     (min, v) => (v.priceAmount < min ? v.priceAmount : min),
@@ -98,34 +102,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </nav>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* Galería */}
-          <div>
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
-              {product.media[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.media[0].url}
-                  alt={product.media[0].alt ?? product.title}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-gray-300">Sin imagen</div>
-              )}
-            </div>
-            {product.media.length > 1 && (
-              <div className="mt-3 grid grid-cols-5 gap-2">
-                {product.media.slice(0, 5).map((m) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={m.id}
-                    src={m.url}
-                    alt={m.alt ?? ""}
-                    className="aspect-square w-full cursor-pointer rounded-lg object-cover ring-1 ring-gray-200"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Galería interactiva */}
+          <ProductGallery
+            title={product.title}
+            images={product.media.map((m) => ({ id: m.id, url: m.url, alt: m.alt }))}
+          />
 
           {/* Compra */}
           <div>
@@ -193,6 +174,30 @@ export default async function ProductPage({ params }: { params: { slug: string }
             </ul>
           )}
         </section>
+
+        {/* Comprados juntos (cross-sell) */}
+        {boughtTogether.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold">Comprados juntos</h2>
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {boughtTogether.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Productos relacionados */}
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold">También te puede gustar</h2>
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </>
   );

@@ -133,6 +133,19 @@ async function main() {
     },
   });
 
+  // Relaciones entre productos: relacionados y "comprados juntos"
+  for (const [fromId, toId, kind] of [
+    [tshirt.id, earbuds.id, "related"],
+    [earbuds.id, tshirt.id, "related"],
+    [earbuds.id, tshirt.id, "bought_together"],
+  ] as const) {
+    await prisma.relatedProduct.upsert({
+      where: { fromId_toId_kind: { fromId, toId, kind } },
+      update: {},
+      create: { fromId, toId, kind },
+    });
+  }
+
   // Cupón de ejemplo: 10% de descuento
   await prisma.discount.upsert({
     where: { code: "BIENVENIDA10" },

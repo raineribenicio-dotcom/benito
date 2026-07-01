@@ -132,12 +132,51 @@ export async function getProductBySlug(slug: string) {
           orderBy: { createdAt: "desc" },
           take: 20,
         },
-        relatedTo: { include: { from: true } },
       },
     });
   } catch (err) {
     console.warn("[catalog] DB no disponible:", (err as Error).message);
     return null;
+  }
+}
+
+/** Productos relacionados y "comprados juntos" de un producto, listos para ProductCard. */
+export async function getRelatedProducts(
+  productId: string,
+): Promise<{ related: CatalogProduct[]; boughtTogether: CatalogProduct[] }> {
+  try {
+    const links = await prisma.relatedProduct.findMany({
+      where: { fromId: productId },
+      include: {
+        to: {
+          include: {
+            media: { orderBy: { position: "asc" }, take: 1 },
+            variants: { orderBy: { priceAmount: "asc" }, take: 1 },
+          },
+        },
+      },
+    });
+
+    const toCard = (p: (typeof links)[number]["to"]): CatalogProduct => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      imageUrl: p.media[0]?.url ?? null,
+      price: p.variants[0]?.priceAmount ?? 0,
+      compareAt: p.variants[0]?.compareAt ?? null,
+      currency: p.variants[0]?.currency ?? "EUR",
+      ratingAverage: p.ratingAverage,
+      ratingCount: p.ratingCount,
+    });
+
+    return {
+      related: links.filter((l) => l.kind === "related" && l.to.status === "ACTIVE").map((l) => toCard(l.to)),
+      boughtTogether: links
+        .filter((l) => l.kind === "bought_together" && l.to.status === "ACTIVE")
+        .map((l) => toCard(l.to)),
+    };
+  } catch {
+    return { related: [], boughtTogether: [] };
   }
 }
 
