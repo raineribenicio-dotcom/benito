@@ -6,6 +6,9 @@ import { Stars } from "@/components/Stars";
 import { ProductPurchase, type VariantVM } from "@/components/ProductPurchase";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductCard } from "@/components/ProductCard";
+import { ReviewForm } from "@/components/ReviewForm";
+import { getCurrentUserId } from "@/lib/auth/session";
+import { submitQuestionAction } from "@/lib/actions/reviews";
 
 export async function generateMetadata({
   params,
@@ -29,6 +32,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   if (!product) notFound();
 
   const { related, boughtTogether } = await getRelatedProducts(product.id);
+  const userId = await getCurrentUserId();
 
   const cheapest = product.variants.reduce(
     (min, v) => (v.priceAmount < min ? v.priceAmount : min),
@@ -172,6 +176,60 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 </li>
               ))}
             </ul>
+          )}
+
+          {/* Escribir reseña */}
+          {userId ? (
+            <ReviewForm productId={product.id} slug={product.slug} />
+          ) : (
+            <p className="mt-4 text-sm text-gray-500">
+              <a href="/login" className="text-brand-600 hover:underline">Inicia sesión</a> para dejar una reseña.
+            </p>
+          )}
+        </section>
+
+        {/* Preguntas y respuestas */}
+        <section className="mt-12">
+          <h2 className="text-xl font-bold">Preguntas y respuestas</h2>
+          {product.questions.length === 0 ? (
+            <p className="mt-2 text-gray-500">Aún no hay preguntas.</p>
+          ) : (
+            <ul className="mt-4 space-y-4">
+              {product.questions.map((q) => (
+                <li key={q.id} className="border-b border-gray-100 pb-4">
+                  <p className="font-medium">P: {q.body}</p>
+                  <p className="text-xs text-gray-400">{q.user.name ?? "Cliente"}</p>
+                  {q.answers.map((a) => (
+                    <p key={a.id} className="mt-2 pl-4 text-sm text-gray-700">
+                      R: {a.body}{" "}
+                      {a.isStaff && <span className="text-xs text-brand-600">(equipo)</span>}
+                    </p>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {userId ? (
+            <form action={submitQuestionAction} className="mt-4 flex gap-2">
+              <input type="hidden" name="productId" value={product.id} />
+              <input type="hidden" name="slug" value={product.slug} />
+              <input
+                name="body"
+                required
+                minLength={5}
+                maxLength={500}
+                placeholder="Haz una pregunta sobre este producto…"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              />
+              <button type="submit" className="rounded-full bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                Preguntar
+              </button>
+            </form>
+          ) : (
+            <p className="mt-4 text-sm text-gray-500">
+              <a href="/login" className="text-brand-600 hover:underline">Inicia sesión</a> para preguntar.
+            </p>
           )}
         </section>
 

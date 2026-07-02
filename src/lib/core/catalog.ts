@@ -132,6 +132,14 @@ export async function getProductBySlug(slug: string) {
           orderBy: { createdAt: "desc" },
           take: 20,
         },
+        questions: {
+          include: {
+            user: { select: { name: true } },
+            answers: { include: { user: { select: { name: true } } }, orderBy: { createdAt: "asc" } },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+        },
       },
     });
   } catch (err) {
