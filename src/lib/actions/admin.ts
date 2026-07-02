@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/db/client";
 import { paymentProvider } from "@/lib/payments";
+import { paypalRefund } from "@/lib/payments/paypal";
 import { requireAdmin } from "@/lib/auth/guard";
 import { parseProductsCsv } from "@/lib/core/csv-import";
 
@@ -177,7 +178,11 @@ export async function refundOrderAction(formData: FormData) {
   const cents = Math.round(amount * 100);
   const payment = order.payments[0];
   if (payment) {
-    await paymentProvider.refund(payment.providerRef, cents);
+    if (payment.provider === "PAYPAL") {
+      await paypalRefund(payment.providerRef, cents, payment.currency);
+    } else {
+      await paymentProvider.refund(payment.providerRef, cents);
+    }
     await prisma.payment.update({
       where: { id: payment.id },
       data: {

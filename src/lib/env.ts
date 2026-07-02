@@ -12,6 +12,9 @@ const schema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
+  PAYPAL_CLIENT_ID: z.string().optional(),
+  PAYPAL_CLIENT_SECRET: z.string().optional(),
+
   ALGOLIA_APP_ID: z.string().optional(),
   ALGOLIA_ADMIN_KEY: z.string().optional(),
 
@@ -37,6 +40,7 @@ export const env = loadEnv();
 
 export const features = {
   stripe: Boolean(env.STRIPE_SECRET_KEY),
+  paypal: Boolean(env.PAYPAL_CLIENT_ID && env.PAYPAL_CLIENT_SECRET),
   algolia: Boolean(env.ALGOLIA_APP_ID && env.ALGOLIA_ADMIN_KEY),
   cloudinary: Boolean(env.CLOUDINARY_CLOUD_NAME),
   email: Boolean(env.RESEND_API_KEY),

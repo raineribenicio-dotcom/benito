@@ -30,6 +30,80 @@ async function nextOrderNumber(): Promise<string> {
   return `#${1001 + count}`;
 }
 
+/**
+ * Crea el pedido PENDING desde el carrito: snapshot de líneas, reserva de stock y
+ * guarda el email en el carrito. NO cobra ni convierte el carrito — eso lo hace
+ * cada proveedor de pago. Reutilizado por Stripe, PayPal y el stub.
+ */
+export async function createPendingOrder(
+  contact: CheckoutContact,
+): Promise<{ ok: true; orderId: string; number: string; total: number; currency: string; cartId: string } | { ok: false; error: string }> {
+  const cart = await getActiveCart();
+  if (!cart || cart.items.length === 0) return { ok: false, error: "El carrito está vacío" };
+
+  for (const it of cart.items) {
+    if (it.quantity > it.available) {
+      return { ok: false, error: `Stock insuficiente para "${it.title}"` };
+    }
+  }
+
+  const userId = await getCurrentUserId();
+  const number = await nextOrderNumber();
+
+  const order = await prisma.$transaction(async (tx) => {
+    const created = await tx.order.create({
+      data: {
+        number,
+        userId: userId ?? undefined,
+        email: contact.email,
+        status: "PENDING",
+        currency: cart.currency,
+        subtotal: cart.subtotal,
+        discountTotal: cart.discountTotal,
+        shippingTotal: cart.shippingTotal,
+        taxTotal: cart.taxTotal,
+        total: cart.total,
+        couponCode: cart.couponCode ?? undefined,
+        items: {
+          create: cart.items.map((it) => ({
+            variantId: it.variantId,
+            title: it.title,
+            variantTitle: it.variantTitle ?? undefined,
+            sku: it.sku,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice,
+            total: it.lineTotal,
+          })),
+        },
+      },
+    });
+
+    for (const it of cart.items) {
+      const level = await tx.stockLevel.findFirst({ where: { variantId: it.variantId } });
+      if (level) {
+        await tx.stockLevel.update({
+          where: { id: level.id },
+          data: { available: { decrement: it.quantity }, reserved: { increment: it.quantity } },
+        });
+      }
+    }
+    return created;
+  });
+
+  await prisma.cart.update({ where: { id: cart.id }, data: { email: contact.email } });
+
+  return { ok: true, orderId: order.id, number, total: cart.total, currency: cart.currency, cartId: cart.id };
+}
+
+/** Marca un pedido como pagado, convierte el carrito y envía la confirmación. */
+export async function confirmOrderPaid(orderId: string, cartId?: string): Promise<void> {
+  await prisma.$transaction([
+    prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } }),
+    ...(cartId ? [prisma.cart.update({ where: { id: cartId }, data: { status: "CONVERTED" } })] : []),
+  ]);
+  await sendOrderConfirmation(orderId);
+}
+
 export async function createOrderFromCart(contact: CheckoutContact): Promise<CheckoutResult> {
   const cart = await getActiveCart();
   if (!cart || cart.items.length === 0) return { ok: false, error: "El carrito está vacío" };

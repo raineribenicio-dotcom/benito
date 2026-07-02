@@ -65,9 +65,10 @@ benito/
       interactiva con zoom, relacionados y "comprados juntos"), búsqueda.
 - [x] **M3 — Carrito y checkout:** carrito persistente (cookie invitado), checkout
       1 paso, envío/impuestos/cupones, creación de pedido y reserva de stock.
-- [x] **M4 — Pagos:** Stripe real (PaymentIntent + Stripe Elements en el checkout
-      + webhook firmado que confirma el pedido). Sin claves => proveedor stub.
-      PayPal pendiente.
+- [x] **M4 — Pagos:** multi-proveedor con selector en el checkout. Stripe
+      (tarjeta + Apple Pay + Google Pay vía Elements + webhook firmado) y
+      **PayPal** (crear/capturar vía REST + SDK de botones). Sin claves => stub.
+      Reembolsos enrutados por proveedor en el admin.
 - [x] **M5 — Cuenta:** Auth.js (Credentials + Google opcional), registro/login,
       direcciones, historial de pedidos, devoluciones self-service, merge de
       carrito de invitado al iniciar sesión.

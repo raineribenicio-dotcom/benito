@@ -70,3 +70,32 @@ class StubPayments implements PaymentProvider {
 export const paymentProvider: PaymentProvider = features.stripe
   ? new StripePayments()
   : new StubPayments();
+
+// --- Métodos de pago disponibles para el checkout ---
+
+export type PaymentMethodId = "card" | "paypal";
+
+export type PaymentMethodInfo = {
+  id: PaymentMethodId;
+  label: string;
+  description: string;
+  live: boolean; // true si hay claves reales; false = modo prueba/stub
+};
+
+export function getAvailablePaymentMethods(): PaymentMethodInfo[] {
+  const methods: PaymentMethodInfo[] = [
+    {
+      id: "card",
+      label: "Tarjeta · Apple Pay · Google Pay",
+      description: "Pago seguro con Stripe",
+      live: features.stripe,
+    },
+    {
+      id: "paypal",
+      label: "PayPal",
+      description: "Paga con tu cuenta de PayPal",
+      live: features.paypal,
+    },
+  ];
+  return methods;
+}

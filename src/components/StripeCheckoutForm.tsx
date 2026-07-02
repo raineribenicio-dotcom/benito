@@ -76,6 +76,11 @@ export function StripeCheckoutForm() {
         setLoading(false);
         return;
       }
+      // Sin Stripe real (stub): el pago ya está confirmado -> a la confirmación.
+      if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || body.paymentStatus === "succeeded") {
+        window.location.href = `/pedido/${String(body.orderNumber).replace("#", "")}`;
+        return;
+      }
       setClientSecret(body.clientSecret);
       setOrderNumber(body.orderNumber);
     } catch {
