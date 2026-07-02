@@ -8,6 +8,7 @@ import { paymentProvider } from "@/lib/payments";
 import { paypalRefund } from "@/lib/payments/paypal";
 import { requireAdmin } from "@/lib/auth/guard";
 import { parseProductsCsv } from "@/lib/core/csv-import";
+import { slugify } from "@/lib/core/slug";
 
 // Mutaciones del panel. Cada acción exige rol admin y registra un AuditLog.
 
@@ -16,15 +17,6 @@ async function audit(action: string, entity: string, entityId?: string, metadata
   await prisma.auditLog.create({
     data: { userId: userId ?? undefined, action, entity, entityId, metadata },
   });
-}
-
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 const productSchema = z.object({
