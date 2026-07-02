@@ -97,5 +97,10 @@ export function getAvailablePaymentMethods(): PaymentMethodInfo[] {
       live: features.paypal,
     },
   ];
+  // En producción no exponemos proveedores en modo prueba (stub): confirmarían
+  // pedidos sin cobro real. En desarrollo se mantienen para poder probar el flujo.
+  if (process.env.NODE_ENV === "production") {
+    return methods.filter((m) => m.live);
+  }
   return methods;
 }

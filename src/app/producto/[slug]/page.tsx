@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ReviewForm } from "@/components/ReviewForm";
 import { getCurrentUserId } from "@/lib/auth/session";
 import { submitQuestionAction } from "@/lib/actions/reviews";
+import { serializeJsonLd } from "@/lib/core/json-ld";
 
 export async function generateMetadata({
   params,
@@ -93,7 +94,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <SiteHeader />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <main className="container py-8">
         {/* Breadcrumb */}

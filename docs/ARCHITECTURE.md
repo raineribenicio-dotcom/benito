@@ -111,6 +111,18 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 La firma se verifica siempre sobre el cuerpo crudo; nunca se confía en el payload
 sin verificar.
 
+## Seguridad (correcciones aplicadas)
+
+- **Confirmación de pedido por token no adivinable:** la URL pública es
+  `/pedido/[token]` (cuid), no el número secuencial, para que nadie pueda
+  enumerar pedidos y filtrar PII (email, artículos) de otros clientes.
+- **JSON-LD escapado:** los datos estructurados se serializan con
+  `serializeJsonLd` (escapa `<`, `>`, `&`, U+2028/9) para evitar XSS almacenado
+  vía título/descripción de producto.
+- **Pasarelas en modo prueba ocultas en producción:** `getAvailablePaymentMethods`
+  filtra proveedores no `live` cuando `NODE_ENV=production`, evitando pedidos sin
+  cobro real por despliegue sin claves.
+
 ## Setup
 
 ```bash

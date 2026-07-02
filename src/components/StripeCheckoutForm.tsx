@@ -11,7 +11,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "");
 const field = "w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none";
 
-function PayStep({ orderNumber }: { orderNumber: string }) {
+function PayStep({ orderToken }: { orderToken: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ function PayStep({ orderNumber }: { orderNumber: string }) {
     if (!stripe || !elements) return;
     setLoading(true);
     setError(null);
-    const returnUrl = `${window.location.origin}/pedido/${orderNumber.replace("#", "")}`;
+    const returnUrl = `${window.location.origin}/pedido/${orderToken}`;
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: { return_url: returnUrl },
@@ -55,7 +55,7 @@ function PayStep({ orderNumber }: { orderNumber: string }) {
 
 export function StripeCheckoutForm() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [orderNumber, setOrderNumber] = useState("");
+  const [orderToken, setOrderToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -78,11 +78,11 @@ export function StripeCheckoutForm() {
       }
       // Sin Stripe real (stub): el pago ya está confirmado -> a la confirmación.
       if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || body.paymentStatus === "succeeded") {
-        window.location.href = `/pedido/${String(body.orderNumber).replace("#", "")}`;
+        window.location.href = `/pedido/${body.orderToken}`;
         return;
       }
       setClientSecret(body.clientSecret);
-      setOrderNumber(body.orderNumber);
+      setOrderToken(body.orderToken);
     } catch {
       setError("Error de red. Inténtalo de nuevo.");
       setLoading(false);
@@ -92,7 +92,7 @@ export function StripeCheckoutForm() {
   if (clientSecret) {
     return (
       <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "stripe" } }}>
-        <PayStep orderNumber={orderNumber} />
+        <PayStep orderToken={orderToken} />
       </Elements>
     );
   }

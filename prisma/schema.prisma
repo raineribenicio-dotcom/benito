@@ -549,7 +549,10 @@ model CartItem {
 
 model Order {
   id                String            @id @default(cuid())
-  number            String            @unique // legible: #1001
+  number            String            @unique // legible: #1001 (display interno)
+  // Token no adivinable para la URL pública de confirmación (evita enumerar
+  // pedidos por número secuencial y filtrar PII de otros clientes).
+  token             String            @unique @default(cuid())
   userId            String?
   email             String
   status            OrderStatus       @default(PENDING)

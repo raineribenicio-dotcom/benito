@@ -31,5 +31,5 @@ export async function placeOrderAction(formData: FormData) {
     redirect(`/checkout?error=${encodeURIComponent(result.error)}`);
   }
 
-  redirect(`/pedido/${encodeURIComponent(result.orderNumber.replace("#", ""))}`);
+  redirect(`/pedido/${encodeURIComponent(result.orderToken)}`);
 }

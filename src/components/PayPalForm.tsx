@@ -62,7 +62,7 @@ export function PayPalForm() {
           onApprove: async (data: { orderID: string }) => {
             const result = await capture(data.orderID);
             if (result.ok) {
-              window.location.href = `/pedido/${String(result.orderNumber).replace("#", "")}`;
+              window.location.href = `/pedido/${result.orderToken}`;
             } else {
               setError("El pago no se completó");
             }

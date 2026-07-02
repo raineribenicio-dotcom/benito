@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({
-    orderNumber: result.orderNumber,
+    orderToken: result.orderToken,
     clientSecret: result.clientSecret,
     paymentStatus: result.paymentStatus,
   });

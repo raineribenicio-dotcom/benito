@@ -6,10 +6,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = { title: "Pedido confirmado", robots: { index: false } };
 
-async function getOrder(number: string) {
+// Se busca por token no adivinable (no por número secuencial) para que un pedido
+// solo sea visible con su enlace de confirmación, sin poder enumerar otros.
+async function getOrder(token: string) {
   try {
     return await prisma.order.findUnique({
-      where: { number: `#${number}` },
+      where: { token },
       include: { items: true },
     });
   } catch {
@@ -20,9 +22,9 @@ async function getOrder(number: string) {
 export default async function OrderConfirmationPage({
   params,
 }: {
-  params: { number: string };
+  params: { token: string };
 }) {
-  const order = await getOrder(params.number);
+  const order = await getOrder(params.token);
   if (!order) notFound();
 
   return (

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   const payment = await prisma.payment.findFirst({
     where: { providerRef: parsed.data.paypalOrderId, provider: "PAYPAL" },
-    include: { order: { select: { number: true } } },
+    include: { order: { select: { token: true } } },
   });
   if (!payment) return NextResponse.json({ error: "Pago no encontrado" }, { status: 404 });
 
@@ -43,5 +43,5 @@ export async function POST(req: NextRequest) {
   const cart = await getActiveCart();
   await confirmOrderPaid(payment.orderId, cart?.id);
 
-  return NextResponse.json({ ok: true, orderNumber: payment.order.number });
+  return NextResponse.json({ ok: true, orderToken: payment.order.token });
 }

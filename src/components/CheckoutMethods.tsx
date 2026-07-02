@@ -11,6 +11,14 @@ import type { PaymentMethodInfo } from "@/lib/payments";
 export function CheckoutMethods({ methods }: { methods: PaymentMethodInfo[] }) {
   const [selected, setSelected] = useState<string>(methods[0]?.id ?? "card");
 
+  if (methods.length === 0) {
+    return (
+      <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        No hay métodos de pago disponibles en este momento. Inténtalo más tarde.
+      </p>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <fieldset>
