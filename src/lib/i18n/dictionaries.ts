@@ -6,7 +6,7 @@ import type { Locale } from "./config";
 export type Dictionary = {
   nav: { fashion: string; electronics: string; home: string; beauty: string; health: string };
   header: { search: string; cart: string; account: string; signIn: string; wishlist: string };
-  home: { heroKicker: string; heroTitle: string; heroSubtitle: string; explore: string; featured: string; bestSellers: string };
+  home: { heroKicker: string; heroTitle: string; heroSubtitle: string; explore: string; featured: string; bestSellers: string; newArrivals: string };
   product: { addToCart: string; outOfStock: string; subscribe: string; reviews: string; specs: string };
   cart: { title: string; empty: string; checkout: string; subtotal: string; shipping: string; tax: string; total: string; free: string };
 };
@@ -21,6 +21,7 @@ const es: Dictionary = {
     explore: "Explorar catálogo",
     featured: "Colecciones destacadas",
     bestSellers: "Más vendidos",
+    newArrivals: "Novedades",
   },
   product: { addToCart: "Añadir al carrito", outOfStock: "Agotado", subscribe: "Suscribirme", reviews: "Reseñas", specs: "Ficha técnica" },
   cart: { title: "Carrito", empty: "Tu carrito está vacío", checkout: "Finalizar compra", subtotal: "Subtotal", shipping: "Envío", tax: "Impuestos (IVA inc.)", total: "Total", free: "Gratis" },
@@ -36,6 +37,7 @@ const en: Dictionary = {
     explore: "Browse catalog",
     featured: "Featured collections",
     bestSellers: "Best sellers",
+    newArrivals: "New arrivals",
   },
   product: { addToCart: "Add to cart", outOfStock: "Out of stock", subscribe: "Subscribe", reviews: "Reviews", specs: "Specifications" },
   cart: { title: "Cart", empty: "Your cart is empty", checkout: "Checkout", subtotal: "Subtotal", shipping: "Shipping", tax: "Tax (incl. VAT)", total: "Total", free: "Free" },
