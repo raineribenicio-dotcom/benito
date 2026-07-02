@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextOrderDate } from "./subscription-schedule";
+import { nextOrderDate, isSubscriptionDue } from "./subscription-schedule";
 
 describe("nextOrderDate", () => {
   const from = new Date("2026-01-01T00:00:00Z");
@@ -19,5 +19,21 @@ describe("nextOrderDate", () => {
   it("no muta la fecha de origen", () => {
     nextOrderDate("MONTHLY", from);
     expect(from.toISOString().slice(0, 10)).toBe("2026-01-01");
+  });
+});
+
+describe("isSubscriptionDue", () => {
+  const now = new Date("2026-02-01T00:00:00Z");
+
+  it("vence si está activa y la fecha ya pasó", () => {
+    expect(isSubscriptionDue({ status: "ACTIVE", nextOrderAt: new Date("2026-01-31T00:00:00Z") }, now)).toBe(true);
+  });
+
+  it("no vence si la fecha es futura", () => {
+    expect(isSubscriptionDue({ status: "ACTIVE", nextOrderAt: new Date("2026-02-05T00:00:00Z") }, now)).toBe(false);
+  });
+
+  it("no vence si está pausada aunque toque la fecha", () => {
+    expect(isSubscriptionDue({ status: "PAUSED", nextOrderAt: new Date("2026-01-01T00:00:00Z") }, now)).toBe(false);
   });
 });

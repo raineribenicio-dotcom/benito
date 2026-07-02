@@ -16,3 +16,11 @@ export function nextOrderDate(interval: Interval, from: Date = new Date()): Date
   next.setDate(next.getDate() + DAYS[interval]);
   return next;
 }
+
+/** Una suscripción está lista para generar pedido si está activa y ya venció. */
+export function isSubscriptionDue(
+  sub: { status: string; nextOrderAt: Date },
+  now: Date = new Date(),
+): boolean {
+  return sub.status === "ACTIVE" && sub.nextOrderAt.getTime() <= now.getTime();
+}

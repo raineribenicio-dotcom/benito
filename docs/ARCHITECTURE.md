@@ -81,6 +81,10 @@ benito/
       enlace de recuperación), **i18n (es/en) + multi-moneda en la UI** (selector,
       cookies, diccionarios, precios convertidos en tienda). Pendiente: facturación
       recurrente real con Stripe Subscriptions.
+- [x] **Cobro recurrente:** cron diario que genera pedido y cobra off-session las
+      suscripciones vencidas (`processDueSubscriptions`), reutilizando la
+      canalización de pedidos. El cobro va tras la interfaz de pagos (stub cobra;
+      Stripe off-session requiere método de pago guardado en el primer checkout).
 
 > **Nota multi-moneda:** la conversión actual es de *display* (tasas estáticas en
 > `lib/i18n/currency.ts`). El cobro se realiza en la moneda base (EUR) y los

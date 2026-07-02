@@ -19,9 +19,13 @@ export type PaymentIntentResult = {
   status: "requires_action" | "processing" | "succeeded";
 };
 
+export type RecurringChargeResult = { id: string; status: "succeeded" | "failed" };
+
 export interface PaymentProvider {
   createPaymentIntent(input: CreateIntentInput): Promise<PaymentIntentResult>;
   refund(paymentRef: string, amount?: number): Promise<{ id: string; amount: number }>;
+  // Cobro recurrente off-session (suscripciones): usa el método de pago guardado.
+  chargeRecurring(input: CreateIntentInput): Promise<RecurringChargeResult>;
 }
 
 function mapStatus(s: string): PaymentIntentResult["status"] {
@@ -55,6 +59,15 @@ class StripePayments implements PaymentProvider {
     });
     return { id: refund.id, amount: refund.amount ?? 0 };
   }
+
+  async chargeRecurring(input: CreateIntentInput): Promise<RecurringChargeResult> {
+    // Cobro off-session real: requiere Stripe Customer + PaymentMethod guardado
+    // (customer/payment_method + off_session:true, confirm:true). Ese guardado se
+    // captura en el primer checkout; hasta cablearlo, el cobro recurrente no
+    // procede con Stripe y la suscripción se salta hasta el siguiente ciclo.
+    console.warn("[stripe] chargeRecurring requiere método de pago guardado (off-session).");
+    return { id: `pi_recurring_${input.orderId}`, status: "failed" };
+  }
 }
 
 class StubPayments implements PaymentProvider {
@@ -64,6 +77,9 @@ class StubPayments implements PaymentProvider {
   }
   async refund(paymentRef: string, amount = 0): Promise<{ id: string; amount: number }> {
     return { id: `re_stub_${paymentRef}`, amount };
+  }
+  async chargeRecurring(input: CreateIntentInput): Promise<RecurringChargeResult> {
+    return { id: `pi_recurring_stub_${input.orderId}`, status: "succeeded" };
   }
 }
 
