@@ -54,6 +54,8 @@ export function ProductPurchase({
         body: JSON.stringify({ variantId: variant.id, quantity: qty }),
       });
       setStatus(res.ok ? "added" : "error");
+      // Abre y refresca el mini-carrito lateral
+      if (res.ok) window.dispatchEvent(new CustomEvent("cart:updated"));
     } catch {
       setStatus("error");
     }

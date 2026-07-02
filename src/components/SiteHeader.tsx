@@ -1,12 +1,14 @@
 import { SearchBox } from "./SearchBox";
 import { PreferenceSwitcher } from "./PreferenceSwitcher";
+import { MiniCart } from "./MiniCart";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getActiveCart } from "@/lib/core/cart";
 import { getI18n } from "@/lib/i18n";
 
 // Cabecera de la tienda: logo, búsqueda, selector de idioma/moneda y accesos.
 
 export async function SiteHeader() {
-  const user = await getCurrentUser();
+  const [user, cart] = await Promise.all([getCurrentUser(), getActiveCart()]);
   const { t } = getI18n();
 
   const nav = [
@@ -31,9 +33,7 @@ export async function SiteHeader() {
           <a href="/wishlist" className="text-sm text-gray-600 hover:text-brand-600" aria-label={t.header.wishlist}>
             ♡
           </a>
-          <a href="/carrito" className="text-sm font-medium text-gray-700 hover:text-brand-600">
-            {t.header.cart}
-          </a>
+          <MiniCart initialCount={cart?.itemCount ?? 0} label={t.header.cart} />
           <a href="/cuenta" className="text-sm text-gray-600 hover:text-brand-600">
             {user ? (user.name ?? t.header.account) : t.header.signIn}
           </a>
