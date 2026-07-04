@@ -1,0 +1,35 @@
+import type { Metadata } from "next";
+import { registerAction } from "@/lib/actions/auth";
+
+export const metadata: Metadata = { title: "Crear cuenta" };
+
+const field = "w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-brand-500 focus:outline-none";
+
+export default function RegisterPage({ searchParams }: { searchParams: { error?: string } }) {
+  return (
+    <main className="container flex min-h-screen max-w-md flex-col justify-center py-12">
+      <a href="/" className="mb-8 text-center text-2xl font-bold text-brand-700">Nuvora</a>
+      <h1 className="text-xl font-bold">Crear cuenta</h1>
+
+      {searchParams.error && (
+        <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          {searchParams.error}
+        </p>
+      )}
+
+      <form action={registerAction} className="mt-6 space-y-4">
+        <input name="name" required placeholder="Nombre" className={field} />
+        <input name="email" type="email" required placeholder="Email" className={field} />
+        <input name="password" type="password" required minLength={8} placeholder="Contraseña (mín. 8)" className={field} />
+        <button type="submit" className="w-full rounded-full bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700">
+          Crear cuenta
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-gray-600">
+        ¿Ya tienes cuenta?{" "}
+        <a href="/login" className="font-medium text-brand-600 hover:underline">Inicia sesión</a>
+      </p>
+    </main>
+  );
+}
