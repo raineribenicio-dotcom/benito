@@ -4,8 +4,7 @@
 // i18n por tablas de traducción, suscripciones y CRO (reviews, Q&A, wishlist).
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearchPostgres"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
