@@ -45,7 +45,7 @@ Las tablas hay que crearlas una vez. Desde tu ordenador, con el repo clonado:
 git clone https://github.com/raineribenicio-dotcom/benito.git nuvora
 cd nuvora
 pnpm install
-echo 'DATABASE_URL="<la de Neon>"' > .env.local
+echo 'DATABASE_URL="<la de Neon>"' > .env   # Prisma lee .env (Next lee .env y .env.local)
 pnpm db:generate
 pnpm db:push      # crea las tablas en Neon
 pnpm db:seed      # carga 5 categorías, productos y el admin

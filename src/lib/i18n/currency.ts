@@ -2,16 +2,20 @@
 // en producción se sustituyen por una fuente FX real (BCE, exchangerate API) o,
 // preferiblemente, por precios fijados por moneda en VariantPrice.
 
-export const CURRENCIES = ["EUR", "USD", "GBP"] as const;
+export const CURRENCIES = ["ARS", "USD", "EUR", "GBP"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
-export const DEFAULT_CURRENCY: Currency = "EUR";
+// Moneda por defecto de la tienda (Argentina).
+export const DEFAULT_CURRENCY: Currency = "ARS";
 
-// Unidades de cada moneda por 1 EUR.
+// Unidades de cada moneda por 1 EUR. ARS es la moneda nativa de los precios; la
+// tasa solo se usa si el cliente cambia de moneda en el selector (aproximada,
+// actualízala con una fuente FX real en producción).
 const RATES: Record<Currency, number> = {
   EUR: 1,
   USD: 1.08,
   GBP: 0.85,
+  ARS: 1300,
 };
 
 export function isCurrency(value: string | undefined | null): value is Currency {
