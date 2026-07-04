@@ -119,7 +119,7 @@ model User {
   role          UserRole  @default(CUSTOMER)
   passwordHash  String? // null cuando sólo usa OAuth
   locale        String    @default("es")
-  currency      String    @default("EUR")
+  currency      String    @default("ARS")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -383,7 +383,7 @@ model ProductVariant {
   // Precio "base" en la moneda por defecto; multi-moneda en VariantPrice
   priceAmount Int // céntimos
   compareAt   Int? // precio tachado para mostrar descuento
-  currency    String  @default("EUR")
+  currency    String  @default("ARS")
   weightGrams Int?
   position    Int     @default(0)
   imageId     String?
@@ -513,7 +513,7 @@ model Cart {
   // Para invitados: token en cookie httpOnly
   token      String     @unique @default(cuid())
   status     CartStatus @default(ACTIVE)
-  currency   String     @default("EUR")
+  currency   String     @default("ARS")
   email      String?
   couponCode String?
   createdAt  DateTime   @default(now())
@@ -556,7 +556,7 @@ model Order {
   email             String
   status            OrderStatus       @default(PENDING)
   fulfillmentStatus FulfillmentStatus @default(UNFULFILLED)
-  currency          String            @default("EUR")
+  currency          String            @default("ARS")
 
   // Importes en céntimos
   subtotal       Int

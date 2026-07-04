@@ -6,6 +6,7 @@ import { convert, isCurrency } from "@/lib/i18n/currency";
 export type Money = { amount: number; currency: string };
 
 const LOCALE_BY_CURRENCY: Record<string, string> = {
+  ARS: "es-AR",
   EUR: "es-ES",
   USD: "en-US",
   GBP: "en-GB",

@@ -13,9 +13,9 @@ export type ShippingRate = {
 };
 
 const DEFAULT_RATE: ShippingRate = {
-  amount: 499,
-  label: "Envío estándar (24-48h)",
-  freeThreshold: 4900, // gratis a partir de 49 €
+  amount: 599900, // $5.999 (céntimos ARS)
+  label: "Envío estándar (24-72h)",
+  freeThreshold: 5000000, // gratis a partir de $50.000
 };
 
 export function computeShipping(input: ShippingInput, rate: ShippingRate = DEFAULT_RATE): number {
