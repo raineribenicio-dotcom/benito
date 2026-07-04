@@ -9,10 +9,12 @@
 E-commerce multi-categoría (moda, electrónica, hogar, belleza, salud), mobile-first.
 **Next.js 14 · TypeScript · Tailwind · PostgreSQL + Prisma · Stripe · Auth.js.**
 
-- ✅ **42/42 tests** en verde (lógica de dominio).
+- ✅ **57/57 tests** en verde (lógica de dominio).
 - ✅ **Typecheck completo sin errores reales.**
-- ⚠️ `prisma generate` / `next build` no ejecutables en el sandbox (egress bloquea
-  los engines de Prisma) → se verifican al arrancar en local/Vercel.
+- ✅ **Revisión de seguridad** realizada y hallazgos corregidos (token de pedido,
+  escape JSON-LD, pasarelas en producción).
+- ⚠️ `prisma generate` / `next build` se ejecutan al arrancar en local/Vercel
+  (el sandbox de desarrollo bloqueaba la descarga de engines de Prisma).
 
 ## Funcionalidades
 
@@ -25,17 +27,20 @@ E-commerce multi-categoría (moda, electrónica, hogar, belleza, salud), mobile-
 | Cuenta + auth | ✅ | Auth.js, registro/login, direcciones, pedidos, devoluciones |
 | Panel admin | ✅ | KPIs, CRUD, **import CSV**, pedidos, reembolsos, cupones, AuditLog |
 | Crecimiento | ✅ | Emails, sitemap/robots, suscripciones |
+| Pagos | ✅ | Multi-proveedor: **Stripe + PayPal** con selector; reembolsos por proveedor |
+| Reseñas + Q&A | ✅ | Escribir reseñas (compra verificada), preguntas y respuestas |
 | Carrito abandonado | ✅ | Cron + email + enlace de recuperación |
+| Suscripciones + cobro recurrente | ✅ | Alta, gestión y cron de facturación recurrente |
 | i18n + multi-moneda (UI) | ✅ | Selector es/en + EUR/USD/GBP, precios convertidos |
-| Wishlist + colecciones | ✅ | Favoritos y páginas de colección (navegación completa) |
-| PayPal | ⏳ | Pendiente (requiere cuenta) |
-| Stripe Subscriptions (cobro recurrente) | ⏳ | Pendiente (requiere cuenta) |
+| Wishlist + colecciones | ✅ | Favoritos y páginas de colección |
+| Mini-carrito + UX | ✅ | Drawer lateral, skeletons de carga, páginas de error/404 |
+| Home | ✅ | Hero, barra de confianza, novedades, más vendidos |
 
-## Próximos pasos sugeridos
+## Para finalizar
 
-1. **Arrancar y verificar build** en local/Vercel (ver abajo).
-2. Revisión de seguridad del diff (`/security-review`).
-3. PayPal / Stripe Subscriptions real (cuando haya cuentas).
+1. **Merge** del PR a `main` (código listo).
+2. **Desplegar** (Neon + Vercel) siguiendo `docs/DEPLOY.md` → URL pública.
+3. **Claves reales** cuando quieras cobrar (Stripe/PayPal) — todo con fallback.
 
 ## Cómo arrancar
 
