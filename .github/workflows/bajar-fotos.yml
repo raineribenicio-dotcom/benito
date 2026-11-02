@@ -1,0 +1,27 @@
+name: bajar-fotos
+on:
+  push:
+    branches: [nexora-fotos]
+    paths: [urls.txt]
+permissions:
+  contents: write
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar fotos originales
+        run: |
+          mkdir -p orig
+          while read -r h u; do
+            [ -z "$h" ] && continue
+            curl -sSL -m 60 -A "Mozilla/5.0" -o "orig/$h.img" "$u" || echo "FALLO $h"
+          done < urls.txt
+          ls -la orig
+      - name: Guardar
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add orig
+          git commit -m "Fotos originales" || true
+          git push
