@@ -1,0 +1,29 @@
+name: bajar-fotos2
+on:
+  push:
+    branches: [nexora-fotos]
+    paths: [urls2.txt]
+permissions:
+  contents: write
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar fotos desde tiendas
+        run: |
+          mkdir -p orig2
+          while read -r h u; do
+            [ -z "$h" ] && continue
+            curl -sSL -m 60 -A "Mozilla/5.0" "$u" -o "orig2/$h.json" || echo "FALLO json $h"
+            jq -r '.product.images[].src' "orig2/$h.json" | head -4 > "orig2/$h.list" || true
+            n=0; while read -r img; do n=$((n+1)); curl -sSL -m 60 -A "Mozilla/5.0" -o "orig2/$h-$n.img" "$img" || true; done < "orig2/$h.list"
+          done < urls2.txt
+          ls -la orig2
+      - name: Guardar
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add orig2
+          git commit -m "Fotos Victus" || true
+          git push
